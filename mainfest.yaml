@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-store
+  labels:
+    app: demo-store
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: demo-store
+  template:
+    metadata:
+      labels:
+        app: demo-store
+    spec:
+      nodeSelector:
+        type: backend
+      containers:
+        - name: demo-store
+          image: liran4200/demo:demo-0.0.1
+          imagePullPolicy: Always
+          ports:
+            - name: demo-store
+              containerPort: 8080
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-store-lb
+  labels:
+    app: demo-store
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+  selector:
+    app: demo-store
