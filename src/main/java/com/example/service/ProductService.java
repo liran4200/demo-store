@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.entity.Product;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface ProductService {
     public void deleteProduct(Long id) throws ProductNotFoundException;
 
     public void assignToCategory(Long productId, Long categoryId ) throws CategoryNotFoundException, ProductNotFoundException;
+
+    public List<Product> downloadProductsReport(Long reportId) throws Exception;
 }

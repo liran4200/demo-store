@@ -41,6 +41,7 @@ public class ProductAPI {
         return this.productService.retrieveProduct(id);
     }
 
+    // should add pagination here.
     @RequestMapping(method=RequestMethod.GET,
             path="api/products",
             produces= MediaType.APPLICATION_JSON_VALUE,
@@ -76,10 +77,18 @@ public class ProductAPI {
         this.productService.assignToCategory(productId, categoryId);
     }
 
+    @RequestMapping(method=RequestMethod.GET,
+            path="api/products/download/{reportId}",
+            produces= MediaType.APPLICATION_JSON_VALUE,
+            consumes= MediaType.APPLICATION_JSON_VALUE)
+    List<Product> downloadReport(@PathVariable Long reportId) throws Exception {
+        return productService.downloadProductsReport(reportId);
+    }
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessage handleSpecificException (ProductNotFoundException e) {
+    public ErrorMessage handleSpecificException (Exception e) {
         return handleException(e);
     }
 

@@ -2,9 +2,13 @@ package com.example.data;
 
 import com.example.dao.CategoryRepository;
 import com.example.dao.ProductRepository;
+import com.example.dao.ReportRepository;
 import com.example.entity.Category;
 import com.example.entity.Product;
+import com.example.entity.Report;
 import com.example.service.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +18,15 @@ import java.util.Optional;
 @Service
 public class DataProductService implements ProductService{
 
-    private ProductRepository productRepository;
-    private CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ReportRepository reportRepository;
 
     @Autowired
-    public DataProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public DataProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ReportRepository reportRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.reportRepository = reportRepository;
     }
 
     @Override
@@ -99,5 +105,22 @@ public class DataProductService implements ProductService{
         p.setCategory(c);
         c.addProduct(p);
         this.categoryRepository.save(c);
+    }
+
+    @Override
+    public List<Product> downloadProductsReport(Long reportId) throws Exception {
+        Optional<Report> op = this.reportRepository.findById(reportId);
+        if (!op.isPresent()){
+            throw new ReportNotFoundException("Report: "+ reportId + " not found");
+        }
+        Report r = op.get();
+        try {
+            String jsonProductString = new String(r.getData());
+            ObjectMapper mapper = new ObjectMapper();
+            List<Product> p = mapper.readValue(jsonProductString, new TypeReference<List<Product>>(){});
+            return p;
+        }catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 }
