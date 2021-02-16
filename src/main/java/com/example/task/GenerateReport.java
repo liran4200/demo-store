@@ -32,26 +32,30 @@ public class GenerateReport {
         this.reportRepository = reportRepository;
     }
 
-    @Scheduled(fixedRateString ="${report.interval}")
+    @Scheduled(fixedRateString ="${report.interval}", initialDelay = 1000)
     public void writeReport() {
         logger.debug("GenerateReport::Write report");
         List<Product> products = this.productRepository.findAll();
-        logger.debug("GenerateReport::products:\n" + products);
+        if( products.size() > 0 ) {
+            logger.debug("GenerateReport::products:\n" + products);
 
-        Comparator< Product > comparator = shuffle(products);
-        Collections.sort(products, comparator);
-        try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final ObjectMapper mapper = new ObjectMapper();
+            Comparator< Product > comparator = shuffle(products);
+            Collections.sort(products, comparator);
+            try {
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                final ObjectMapper mapper = new ObjectMapper();
 
-            mapper.writeValue(out, products);
+                mapper.writeValue(out, products);
 
-            byte[] data = out.toByteArray();
-            Report r = new Report();
-            r.setData(data);
-            reportRepository.save(r);
-        }catch (IOException e) {
-            logger.error(e.getMessage());
+                byte[] data = out.toByteArray();
+                Report r = new Report();
+                r.setData(data);
+                reportRepository.save(r);
+            }catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        }else {
+            logger.debug("GenerateReport::products still not exists, skipping");
         }
     }
 
