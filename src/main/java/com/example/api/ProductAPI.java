@@ -1,7 +1,7 @@
 package com.example.api;
 
-
 import com.example.entity.Product;
+import com.example.service.CategoryNotFoundException;
 import com.example.service.ProductAlreadyExistsException;
 import com.example.service.ProductNotFoundException;
 import com.example.service.ProductService;
@@ -30,7 +30,6 @@ public class ProductAPI {
             produces=MediaType.APPLICATION_JSON_VALUE,
             consumes= MediaType.APPLICATION_JSON_VALUE)
     public Product createProduct(@RequestBody Product newProduct){
-
         return this.productService.createProduct(newProduct);
     }
 
@@ -66,6 +65,15 @@ public class ProductAPI {
             consumes=MediaType.APPLICATION_JSON_VALUE)
     public void deleteProduct (@PathVariable Long id) throws ProductNotFoundException {
         this.productService.deleteProduct(id);
+    }
+
+    @RequestMapping(
+            method= RequestMethod.POST,
+            path="api/products/{productId}/category/{categoryId}",
+            produces=MediaType.APPLICATION_JSON_VALUE
+    )
+    public void assignCategory(@PathVariable Long productId, @PathVariable Long categoryId ) throws CategoryNotFoundException, ProductNotFoundException {
+        this.productService.assignToCategory(productId, categoryId);
     }
 
 

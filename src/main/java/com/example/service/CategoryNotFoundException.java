@@ -1,9 +1,9 @@
 package com.example.service;
 
-public class ProductNotFoundException extends Exception {
+public class CategoryNotFoundException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    public ProductNotFoundException(String message) {
+    public CategoryNotFoundException(String message) {
         super(message);
     }
 }

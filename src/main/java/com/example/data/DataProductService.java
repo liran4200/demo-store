@@ -1,10 +1,10 @@
 package com.example.data;
 
+import com.example.dao.CategoryRepository;
 import com.example.dao.ProductRepository;
+import com.example.entity.Category;
 import com.example.entity.Product;
-import com.example.service.ProductAlreadyExistsException;
-import com.example.service.ProductNotFoundException;
-import com.example.service.ProductService;
+import com.example.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +15,11 @@ import java.util.Optional;
 public class DataProductService implements ProductService{
 
     private ProductRepository productRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    public DataProductService(ProductRepository productRepository) {
+    public DataProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
     }
 
@@ -76,5 +78,26 @@ public class DataProductService implements ProductService{
             throw new ProductNotFoundException("Product: "+ id + " not found");
         }
 
+    }
+
+    @Override
+    public void assignToCategory(Long productId, Long categoryId) throws CategoryNotFoundException, ProductNotFoundException {
+        Optional<Category> optionalCategory = this.categoryRepository.findById(categoryId);
+
+        if (!optionalCategory.isPresent()){
+            throw new CategoryNotFoundException("Category: "+ categoryId + " not found");
+        }
+
+        Optional<Product> optionalProduct = this.productRepository.findById(productId);
+
+        if (!optionalProduct.isPresent()){
+            throw new ProductNotFoundException("Product: "+ productId + " not found");
+        }
+
+        Category c = optionalCategory.get();
+        Product p = optionalProduct.get();
+        p.setCategory(c);
+        c.addProduct(p);
+        this.categoryRepository.save(c);
     }
 }

@@ -1,62 +1,36 @@
 package com.example.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Product {
 
     // may be abstract product
-    private @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private @Id @GeneratedValue(strategy=GenerationType.AUTO)
               Long     id;
     private String   name;
     private String   description;
     private float    price;
 
-    @ManyToOne
-    @JoinColumn(name="category_id", nullable=true)
+    @JsonBackReference()
+    @JoinColumn(name = "categoryId")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
-    public Product() { }
-
-    public Product(Long id, String name, String description, float price) {
+    public Product(String name, String description, float price) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -70,14 +44,6 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, price);
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public float getPrice() {
-        return price;
     }
 
     @Override

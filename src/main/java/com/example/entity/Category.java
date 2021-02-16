@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -14,18 +15,20 @@ import java.util.Objects;
 public class Category implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name="category_id")
     private Long categoryId;
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @JsonManagedReference()
+    @OneToMany(
+            mappedBy = "category",
+            fetch = FetchType.LAZY
+    )
     private List<Product> products = new ArrayList<>();
 
-    public Category(Long categoryId, String name, List<Product> products) {
+    public Category(String name) {
         this.name = name;
-        this.products = products;
-        this.categoryId = categoryId;
     }
 
     @Override
@@ -34,6 +37,10 @@ public class Category implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category) o;
         return Objects.equals(categoryId, category.categoryId) && Objects.equals(name, category.name) && Objects.equals(products, category.products);
+    }
+
+    public void addProduct( Product p ) {
+        products.add(p);
     }
 
     @Override

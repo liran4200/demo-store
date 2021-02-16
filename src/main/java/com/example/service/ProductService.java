@@ -16,4 +16,5 @@ public interface ProductService {
 
     public void deleteProduct(Long id) throws ProductNotFoundException;
 
+    public void assignToCategory(Long productId, Long categoryId ) throws CategoryNotFoundException, ProductNotFoundException;
 }
