@@ -1,3 +1,3 @@
 TAG=$1
-#mvn package
+mvn package
 docker build -t "${TAG}" .
