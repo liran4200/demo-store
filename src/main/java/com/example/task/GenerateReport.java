@@ -67,7 +67,7 @@ public class GenerateReport {
     }
 
 
-    public Function<Product, ?> getFunction(int number) {
+    private Function<Product, ?> getFunction(int number) {
         switch (number){
             case 0:
                 return Product::getName;
