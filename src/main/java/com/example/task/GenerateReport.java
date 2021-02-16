@@ -5,7 +5,6 @@ import com.example.dao.ReportRepository;
 import com.example.entity.Product;
 import com.example.entity.Report;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +13,18 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.comparing;
 
 @Component
 public class GenerateReport {
     private static final Logger logger = LoggerFactory.getLogger(GenerateReport.class);
-
+    private final int MAX_RANDOM = 3;
     private ProductRepository productRepository;
     private ReportRepository reportRepository;
 
@@ -34,13 +36,18 @@ public class GenerateReport {
 
     @Scheduled(fixedRateString ="${report.interval}", initialDelay = 1000)
     public void writeReport() {
-        logger.debug("GenerateReport::Write report");
+        logger.info("GenerateReport::Write report");
         List<Product> products = this.productRepository.findAll();
         if( products.size() > 0 ) {
-            logger.debug("GenerateReport::products:\n" + products);
+            logger.info("GenerateReport::products:\n" + products);
+            int number = (int) (Math.random() * MAX_RANDOM);
+            logger.info("GenerateReport:: random number: " + number);
+            Function f = getFunction(number);
+            Comparator<Product> comparator = comparing(f, naturalOrder());
 
-            Comparator< Product > comparator = shuffle(products);
+            //Comparator< Product > comparator = shuffle(products);
             Collections.sort(products, comparator);
+            logger.info("GenerateReport::sorted products:\n" + products);
             try {
                 final ByteArrayOutputStream out = new ByteArrayOutputStream();
                 final ObjectMapper mapper = new ObjectMapper();
@@ -55,18 +62,24 @@ public class GenerateReport {
                 logger.error(e.getMessage());
             }
         }else {
-            logger.debug("GenerateReport::products still not exists, skipping");
+            logger.info("GenerateReport::products still not exists, skipping");
         }
     }
 
-    private Comparator<Product> shuffle(List<Product> product ){
-        // should shuffle by field.
-        return new Comparator<Product>() {
-            @Override
-            public int compare(Product p1, Product p2) {
-                return p1.getId().compareTo(p2.getId());
-            }
-        };
+
+    public Function<Product, ?> getFunction(int number) {
+        switch (number){
+            case 0:
+                return Product::getName;
+            case 1:
+                return Product::getId;
+            case 2:
+                return Product::getDescription;
+            case 3:
+                return Product::getPrice;
+            default:
+                return null;
+        }
     }
 
 }

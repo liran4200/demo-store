@@ -20,4 +20,6 @@ public interface ProductService {
     public void assignToCategory(Long productId, Long categoryId ) throws CategoryNotFoundException, ProductNotFoundException;
 
     public List<Product> downloadProductsReport(Long reportId) throws Exception;
+
+
 }
